@@ -5,3 +5,8 @@
 [Tampermonkey](http://tampermonkey.net/)で使用することを前提としています。
 
 他のインスタンスの公開ハッシュタグタイムラインを対象にする場合は @match を適宜変更ください。
+
+ファボ等の操作を行う場合は以下の情報が必要です。
+
+- YOUR_MASTODON_DOMAIN
+- ACCESS_TOKEN
