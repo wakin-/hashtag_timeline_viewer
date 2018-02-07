@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hashtag Timeline Viewer
 // @namespace
-// @version      0.2
+// @version      0.3
 // @description  Mastodonの公開側のハッシュタグタイムラインの拡張
 // @match        https://theboss.tech/tags/theboss_tech
 // @match        https://abyss.fun/tags/abyss_fun
