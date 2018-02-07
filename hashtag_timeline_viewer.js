@@ -16,6 +16,11 @@ var HASHTAG = "";
 (function() {
     'use strict'
 
+    document.querySelector(".container").style.display = "block"
+    document.querySelector("#mastodon-timeline").style.width = "675px"
+    document.querySelector('.column').style.width = "675px"
+    document.querySelector('.scrollable').style.height = "800px"
+
     document.querySelector(".column-header").innerHTML +=
         '<div class="compose-form__publish">\
             <div class="compose-form__publish-button-wrapper" style="padding: 5px 10px">\
@@ -37,14 +42,14 @@ var HASHTAG = "";
 
     document.querySelector(".item-list").onmouseover = function(e) {
         let target = e.target
-        if (target.classList.contains("status__action-bar-button") && target.classList.contains("icon-button") && target.classList.contains("disabled")) {
+        if (target.classList.contains("icon-button") && target.classList.contains("disabled")) {
             target.classList.remove("disabled")
         }
     }
     document.querySelector(".item-list").onclick = function(e) {
         let target = e.target
 
-        if (target.classList.contains('status__action-bar-button') && target.classList.contains('icon-button')) {
+        if (target.classList.contains('icon-button')) {
             let status = target.closest(".status.status-public")
             let toot_url = status.querySelector(".status__relative-time").href
 
@@ -74,7 +79,6 @@ var HASHTAG = "";
                         this.classList.add("active")
                     }.bind(target)
                 }
-            } else if (target.firstChild.classList.contains('fa-reply') || target.firstChild.classList.contains('fa-reply-all')) {
             }
 
             search(toot_url, method, callback)
