@@ -3,13 +3,15 @@
 // @namespace
 // @version      0.2
 // @description  Mastodonの公開側のハッシュタグタイムラインの拡張
-// @match        https://theboss.tech/tags/*
+// @match        https://theboss.tech/tags/theboss_tech
+// @match        https://abyss.fun/tags/abyss_fun
 // @grant        none
 // ==/UserScript==
 
-var YOUR_MASTODON_DOMAIN = ""
+var YOUR_MASTODON_DOMAIN = "";
 var ACCESS_TOKEN = "";
-var HASHTAG = "theboss_tech";
+
+var HASHTAG = "";
 
 (function() {
     'use strict'
@@ -26,39 +28,58 @@ var HASHTAG = "theboss_tech";
     }
 
     document.querySelector("#open_share_window").onclick = function() {
-        window.open('web+mastodon://share?text='+encodeURIComponent("\n#"+HASHTAG),'hashtag_timeline_viewer_share_window','width=400,height=400');
+        if (HASHTAG != "" && HASHTAG.length > 0) {
+            window.open('https://'+YOUR_MASTODON_DOMAIN+'/share?text='+encodeURIComponent("\n#"+HASHTAG),'hashtag_timeline_viewer_share_window','width=400,height=400');
+        } else {
+            alert("ハッシュタグが空です")
+        }
     }
 
     document.querySelector(".item-list").onmouseover = function(e) {
-        if (e.target.className === "status__action-bar-button star-icon icon-button disabled") {
-            e.target.classList.remove("disabled")
+        let target = e.target
+        if (target.classList.contains("status__action-bar-button") && target.classList.contains("icon-button") && target.classList.contains("disabled")) {
+            target.classList.remove("disabled")
         }
     }
     document.querySelector(".item-list").onclick = function(e) {
         let target = e.target
 
-        if (target.className.match('^status__action-bar-button star-icon icon-button')) {
+        if (target.classList.contains('status__action-bar-button') && target.classList.contains('icon-button')) {
             let status = target.closest(".status.status-public")
             let toot_url = status.querySelector(".status__relative-time").href
 
             let method = null
             let callback = null
-            if (target.className.match('active$')) {
-                method = "unfavourite"
-                callback = function() {
-                    this.classList.remove("active")
-                }.bind(target)
-            } else {
-                method = "favourite"
-                callback = function() {
-                    this.classList.add("active")
-                }.bind(target)
+            if (target.firstChild.classList.contains('fa-retweet')) {
+                if (target.classList.contains('active')) {
+                    method = "unreblog"
+                    callback = function() {
+                        this.classList.remove("active")
+                    }.bind(target)
+                } else {
+                    method = "reblog"
+                    callback = function() {
+                        this.classList.add("active")
+                    }.bind(target)
+                }
+            } else if (target.firstChild.classList.contains('fa-star')) {
+                if (target.classList.contains('active')) {
+                    method = "unfavourite"
+                    callback = function() {
+                        this.classList.remove("active")
+                    }.bind(target)
+                } else {
+                    method = "favourite"
+                    callback = function() {
+                        this.classList.add("active")
+                    }.bind(target)
+                }
+            } else if (target.firstChild.classList.contains('fa-reply') || target.firstChild.classList.contains('fa-reply-all')) {
             }
 
             search(toot_url, method, callback)
         }
     }
-
 })()
 
 function search(toot_url, method, callback) {
@@ -74,7 +95,12 @@ function search(toot_url, method, callback) {
         }
         let toot_id = json_arr['statuses'][0]['id']
 
-        statuses_post(toot_id, method, callback)
+        if (method != null && callback != null) {
+            statuses_post(toot_id, method, callback)
+        } else {
+            alert(YOUR_MASTODON_DOMAIN+"を開きます。\n引き続き操作を行ってください。")
+            window.open("https://"+YOUR_MASTODON_DOMAIN+"/web/statuses/"+toot_id)
+        }
     },
     function(status) { alert("失敗しました。YOUR_MASTODON_DOMAINやACCESS_TOKENは正しいですか？") })
 }
@@ -85,7 +111,7 @@ function statuses_post(toot_id, method, callback) {
         {Authorization: "Bearer "+ACCESS_TOKEN},
         {},
         callback,
-        function(status) { alert("失敗しました。YOUR_MASTODON_DOMAINやACCESS_TOKENは正しいですか？") })    
+        function(status) { alert("失敗しました。YOUR_MASTODON_DOMAINやACCESS_TOKENは正しいですか？") })
 }
 
 // 非同期リクエスト
